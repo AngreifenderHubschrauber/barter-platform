@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Профиль - Barter Platform{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-4">
+        <!-- Карточка с информацией о пользователе -->
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <i class="bi bi-person-circle text-primary" style="font-size: 5rem;"></i>
+                <h4 class="mt-3">{{ user.username }}</h4>
+                <p class="text-muted mb-1">{{ user.email }}</p>
+                <p class="text-muted">Участник с {{ user.date_joined|date:"d.m.Y" }}</p>
+                
+                <hr>
+                
+                <!-- Статистика пользователя -->
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h5 class="mb-0">{{ active_ads_count }}</h5>
+                        <small class="text-muted">Активных объявлений</small>
+                    </div>
+                    <div class="col-6">
+                        <h5 class="mb-0">{{ completed_exchanges }}</h5>
+                        <small class="text-muted">Завершенных обменов</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Быстрые действия -->
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Быстрые действия</h5>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'ads:ad_create' %}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-circle"></i> Создать объявление
+                    </a>
+                    <a href="{% url 'ads:my_ads' %}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-list"></i> Мои объявления
+                    </a>
+                    <a href="{% url 'ads:proposal_list' %}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-envelope"></i> Предложения обмена
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-8">
+        <!-- Форма редактирования профиля -->
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Редактировать профиль</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.first_name.id_for_label }}" class="form-label">{{ form.first_name.label }}</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                            <div class="text-danger small">{{ form.first_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.last_name.id_for_label }}" class="form-label">{{ form.last_name.label }}</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                            <div class="text-danger small">{{ form.last_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                        <div class="text-danger small">{{ form.email.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.phone.id_for_label }}" class="form-label">{{ form.phone.label }}</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                            <div class="text-danger small">{{ form.phone.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.city.id_for_label }}" class="form-label">{{ form.city.label }}</label>
+                            {{ form.city }}
+                            {% if form.city.errors %}
+                            <div class="text-danger small">{{ form.city.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.bio.id_for_label }}" class="form-label">{{ form.bio.label }}</label>
+                        {{ form.bio }}
+                        {% if form.bio.errors %}
+                        <div class="text-danger small">{{ form.bio.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Сохранить изменения
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

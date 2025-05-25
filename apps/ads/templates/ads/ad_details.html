@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ ad.title }} - Barter Platform{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            {% if ad.image_url %}
+            <img src="{{ ad.image_url }}" class="card-img-top" alt="{{ ad.title }}" style="max-height: 500px; object-fit: contain;">
+            {% endif %}
+            <div class="card-body">
+                <h1 class="card-title">{{ ad.title }}</h1>
+                
+                <!-- Информация об объявлении -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>Категория:</strong> {{ ad.get_category_display }}</p>
+                        <p class="mb-1"><strong>Состояние:</strong> {{ ad.get_condition_display }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>Автор:</strong> {{ ad.user.username }}</p>
+                        <p class="mb-1"><strong>Опубликовано:</strong> {{ ad.created_at|date:"d.m.Y H:i" }}</p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <h3>Описание</h3>
+                <p class="card-text">{{ ad.description|linebreaks }}</p>
+                
+                <!-- Кнопки действий -->
+                {% if user.is_authenticated %}
+                    {% if can_edit %}
+                    <div class="mt-4">
+                        <a href="{% url 'ads:ad_edit' ad.pk %}" class="btn btn-warning">
+                            <i class="bi bi-pencil"></i> Редактировать
+                        </a>
+                        <a href="{% url 'ads:ad_delete' ad.pk %}" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Удалить
+                        </a>
+                    </div>
+                    {% elif ad.is_active %}
+                    <div class="mt-4">
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exchangeModal">
+                            <i class="bi bi-arrow-left-right"></i> Предложить обмен
+                        </button>
+                    </div>
+                    {% endif %}
+                {% else %}
+                <div class="alert alert-info mt-4">
+                    <i class="bi bi-info-circle"></i> <a href="{% url 'users:login' %}">Войдите</a>, чтобы предложить обмен.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Другие объявления автора -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Другие объявления {{ ad.user.username }}</h5>
+            </div>
+            <div class="card-body">
+                {% with other_ads=ad.user.ads.exclude(pk=ad.pk).filter(is_active=True)[:5] %}
+                {% if other_ads %}
+                <div class="list-group">
+                    {% for other_ad in other_ads %}
+                    <a href="{% url 'ads:ad_detail' other_ad.pk %}" class="list-group-item list-group-item-action">
+                        <h6 class="mb-1">{{ other_ad.title }}</h6>
+                        <small class="text-muted">{{ other_ad.get_category_display }}</small>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">Других активных объявлений нет.</p>
+                {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для предложения обмена -->
+{% if user.is_authenticated and user_ads and not can_edit %}
+<div class="modal fade" id="exchangeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'ads:proposal_create' ad.pk %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Предложить обмен</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="ad_sender" class="form-label">Выберите ваше объявление для обмена:</label>
+                        <select name="ad_sender" id="ad_sender" class="form-select" required>
+                            <option value="">-- Выберите объявление --</option>
+                            {% for user_ad in user_ads %}
+                            <option value="{{ user_ad.pk }}">{{ user_ad.title }} ({{ user_ad.get_condition_display }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">Комментарий:</label>
+                        <textarea name="comment" id="comment" rows="3" class="form-control" required placeholder="Почему вы хотите обменяться?"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-success">Отправить предложение</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

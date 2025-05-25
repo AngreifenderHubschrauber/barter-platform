@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Предложения обмена - Barter Platform{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Предложения обмена</h1>
+        
+        <!-- Полученные предложения -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-inbox"></i> Полученные предложения ({{ received_proposals.count }})</h5>
+            </div>
+            <div class="card-body">
+                {% if received_proposals %}
+                {% for proposal in received_proposals %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <h6>Предлагают:</h6>
+                                <p class="mb-1"><strong>{{ proposal.ad_sender.title }}</strong></p>
+                                <p class="text-muted mb-0">{{ proposal.ad_sender.get_condition_display }} • {{ proposal.ad_sender.get_category_display }}</p>
+                                <small class="text-muted">От: {{ proposal.sender.username }}</small>
+                            </div>
+                            <div class="col-md-1 text-center d-flex align-items-center justify-content-center">
+                                <i class="bi bi-arrow-left-right fs-3"></i>
+                            </div>
+                            <div class="col-md-5">
+                                <h6>Взамен на:</h6>
+                                <p class="mb-1"><strong>{{ proposal.ad_receiver.title }}</strong></p>
+                                <p class="text-muted mb-0">{{ proposal.ad_receiver.get_condition_display }} • {{ proposal.ad_receiver.get_category_display }}</p>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <p class="mb-1"><strong>Комментарий:</strong></p>
+                                <p class="mb-0">{{ proposal.comment }}</p>
+                                <small class="text-muted">{{ proposal.created_at|date:"d.m.Y H:i" }}</small>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                {% if proposal.status == 'pending' %}
+                                <span class="badge bg-warning mb-2">Ожидает рассмотрения</span>
+                                <div>
+                                    <a href="{% url 'ads:proposal_accept' proposal.pk %}" class="btn btn-success btn-sm" onclick="return confirm('Вы уверены, что хотите принять это предложение? Объявления будут деактивированы.')">
+                                        <i class="bi bi-check-circle"></i> Принять
+                                    </a>
+                                    <a href="{% url 'ads:proposal_reject' proposal.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Вы уверены, что хотите отклонить это предложение?')">
+                                        <i class="bi bi-x-circle"></i> Отклонить
+                                    </a>
+                                </div>
+                                {% elif proposal.status == 'accepted' %}
+                                <span class="badge bg-success">Принято</span>
+                                {% else %}
+                                <span class="badge bg-danger">Отклонено</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted mb-0">У вас пока нет полученных предложений.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Отправленные предложения -->
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-send"></i> Отправленные предложения ({{ sent_proposals.count }})</h5>
+            </div>
+            <div class="card-body">
+                {% if sent_proposals %}
+                {% for proposal in sent_proposals %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <h6>Вы предлагаете:</h6>
+                                <p class="mb-1"><strong>{{ proposal.ad_sender.title }}</strong></p>
+                                <p class="text-muted mb-0">{{ proposal.ad_sender.get_condition_display }} • {{ proposal.ad_sender.get_category_display }}</p>
+                            </div>
+                            <div class="col-md-1 text-center d-flex align-items-center justify-content-center">
+                                <i class="bi bi-arrow-left-right fs-3"></i>
+                            </div>
+                            <div class="col-md-5">
+                                <h6>Взамен на:</h6>
+                                <p class="mb-1"><strong>{{ proposal.ad_receiver.title }}</strong></p>
+                                <p class="text-muted mb-0">{{ proposal.ad_receiver.get_condition_display }} • {{ proposal.ad_receiver.get_category_display }}</p>
+                                <small class="text-muted">Владелец: {{ proposal.receiver.username }}</small>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <p class="mb-1"><strong>Ваш комментарий:</strong></p>
+                                <p class="mb-0">{{ proposal.comment }}</p>
+                                <small class="text-muted">{{ proposal.created_at|date:"d.m.Y H:i" }}</small>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                {% if proposal.status == 'pending' %}
+                                <span class="badge bg-warning">Ожидает рассмотрения</span>
+                                {% elif proposal.status == 'accepted' %}
+                                <span class="badge bg-success">Принято</span>
+                                {% else %}
+                                <span class="badge bg-danger">Отклонено</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted mb-0">Вы пока не отправляли предложений.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Все объявления - Barter Platform{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Объявления для обмена</h1>
+        
+        <!-- Форма поиска и фильтрации -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-4">
+                        {{ search_form.query.label_tag }}
+                        {{ search_form.query }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ search_form.category.label_tag }}
+                        {{ search_form.category }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ search_form.condition.label_tag }}
+                        {{ search_form.condition }}
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search"></i> Поиск
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Список объявлений -->
+        {% if ads %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for ad in ads %}
+            <div class="col">
+                <div class="card h-100">
+                    {% if ad.image_url %}
+                    <img src="{{ ad.image_url }}" class="card-img-top" alt="{{ ad.title }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ ad.title }}</h5>
+                        <p class="card-text">{{ ad.description|truncatewords:20 }}</p>
+                        <div class="mb-2">
+                            <span class="badge bg-info badge-category">{{ ad.get_category_display }}</span>
+                            <span class="badge bg-secondary badge-category">{{ ad.get_condition_display }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="bi bi-person"></i> {{ ad.user.username }}
+                            </small>
+                            <small class="text-muted">
+                                <i class="bi bi-clock"></i> {{ ad.created_at|date:"d.m.Y" }}
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="{% url 'ads:ad_detail' ad.pk %}" class="btn btn-primary btn-sm w-100">
+                            <i class="bi bi-eye"></i> Подробнее
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Пагинация -->
+        {% if is_paginated %}
+        <nav aria-label="Навигация по страницам" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if request.GET.query %}&query={{ request.GET.query }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.condition %}&condition={{ request.GET.condition }}{% endif %}">Первая</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.query %}&query={{ request.GET.query }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.condition %}&condition={{ request.GET.condition }}{% endif %}">Предыдущая</a>
+                </li>
+                {% endif %}
+                
+                <li class="page-item active">
+                    <span class="page-link">
+                        Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+                    </span>
+                </li>
+                
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.query %}&query={{ request.GET.query }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.condition %}&condition={{ request.GET.condition }}{% endif %}">Следующая</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.query %}&query={{ request.GET.query }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.condition %}&condition={{ request.GET.condition }}{% endif %}">Последняя</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+        
+        {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> Объявления не найдены. Попробуйте изменить параметры поиска.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

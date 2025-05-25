@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Вход - Barter Platform{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow">
+            <div class="card-body p-5">
+                <h2 class="text-center mb-4">Вход в систему</h2>
+                
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Отображение ошибок формы -->
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Имя пользователя -->
+                    <div class="mb-3">
+                        <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                        <div class="text-danger small">{{ form.username.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Пароль -->
+                    <div class="mb-3">
+                        <label for="{{ form.password.id_for_label }}" class="form-label">{{ form.password.label }}</label>
+                        {{ form.password }}
+                        {% if form.password.errors %}
+                        <div class="text-danger small">{{ form.password.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-box-arrow-in-right"></i> Войти
+                        </button>
+                    </div>
+                </form>
+                
+                <hr class="my-4">
+                
+                <p class="text-center mb-0">
+                    Нет аккаунта? <a href="{% url 'users:register' %}" class="text-decoration-none">Зарегистрируйтесь</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

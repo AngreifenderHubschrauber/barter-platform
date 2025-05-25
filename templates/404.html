@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Страница не найдена - Barter Platform{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+        <div class="error-template">
+            <h1 class="display-1 text-muted">404</h1>
+            <h2>Упс! Страница не найдена</h2>
+            <div class="error-details mb-4">
+                Извините, запрашиваемая страница не существует или была удалена.
+            </div>
+            <div class="error-actions">
+                <a href="{% url 'ads:ad_list' %}" class="btn btn-primary">
+                    <i class="bi bi-house"></i> На главную
+                </a>
+                <a href="javascript:history.back()" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Назад
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.error-template {
+    padding: 40px 15px;
+}
+.error-actions {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+.error-actions .btn {
+    margin-right: 10px;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,186 @@
+/* НОВОЕ: Дополнительные стили для проекта */
+
+/* Общие стили */
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Навигация */
+.navbar-brand:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s;
+}
+
+.navbar .btn-primary {
+    transition: all 0.3s;
+}
+
+.navbar .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Карточки объявлений */
+.card {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.card-img-top {
+    transition: transform 0.3s;
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+/* Бейджи */
+.badge-category {
+    background-color: var(--info-color);
+}
+
+.badge-condition {
+    background-color: var(--secondary-color);
+}
+
+/* Формы */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+/* Предложения обмена */
+.proposal-card {
+    border-left: 4px solid var(--primary-color);
+}
+
+.proposal-card.pending {
+    border-left-color: var(--warning-color);
+}
+
+.proposal-card.accepted {
+    border-left-color: var(--success-color);
+}
+
+.proposal-card.rejected {
+    border-left-color: var(--danger-color);
+}
+
+/* Анимация стрелки обмена */
+.exchange-arrow {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Таблицы */
+.table-hover tbody tr:hover {
+    background-color: rgba(0,123,255,0.05);
+}
+
+/* Модальные окна */
+.modal-content {
+    border-radius: 10px;
+}
+
+/* Профиль пользователя */
+.profile-stats {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+/* Сообщения */
+.alert {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.1rem;
+    }
+    
+    .card-title {
+        font-size: 1rem;
+    }
+    
+    .btn-group .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* Утилиты */
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.shadow-hover {
+    transition: box-shadow 0.3s;
+}
+
+.shadow-hover:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important;
+}
+
+/* Загрузчик */
+.spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+/* Пустые состояния */
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+{% if form.instance.pk %}Редактировать объявление{% else %}Новое объявление{% endif %} - Barter Platform
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    {% if form.instance.pk %}
+                        <i class="bi bi-pencil"></i> Редактировать объявление
+                    {% else %}
+                        <i class="bi bi-plus-circle"></i> Создать новое объявление
+                    {% endif %}
+                </h3>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Отображение ошибок формы -->
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Использование crispy forms для красивого отображения -->
+                    {{ form|crispy }}
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% if form.instance.pk %}{% url 'ads:ad_detail' form.instance.pk %}{% else %}{% url 'ads:ad_list' %}{% endif %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Отмена
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            {% if form.instance.pk %}
+                                <i class="bi bi-check-circle"></i> Сохранить изменения
+                            {% else %}
+                                <i class="bi bi-plus-circle"></i> Создать объявление
+                            {% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Подсказки по заполнению -->
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title">Советы по созданию объявления</h5>
+                <ul class="mb-0">
+                    <li>Используйте понятный и информативный заголовок</li>
+                    <li>Подробно опишите состояние товара и его особенности</li>
+                    <li>Добавьте ссылку на изображение товара для привлечения внимания</li>
+                    <li>Выберите правильную категорию для лучшей видимости</li>
+                    <li>Честно укажите состояние товара</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
