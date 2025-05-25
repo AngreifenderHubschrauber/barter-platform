@@ -14,30 +14,30 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+# barter_platform/barter_platform/urls.py
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from rest_framework.routers import DefaultRouter
-from apps.ads.api_views import AdViewSet, ExchangeProposalViewSet
 
-# Создание роутера для API
-router = DefaultRouter()
-router.register(r'ads', AdViewSet)
-router.register(r'proposals', ExchangeProposalViewSet, basename='proposal')
+# УДАЛИТЕ ЭТИ ДВЕ СТРОКИ:
+# from rest_framework.routers import DefaultRouter
+# from apps.ads.api_views import AdViewSet, ExchangeProposalViewSet
+
+# УДАЛИТЕ ЭТИ ДВЕ СТРОКИ, так как роутер теперь в apps/ads/urls_api.py:
+# router = DefaultRouter()
+# router.register(r'ads', AdViewSet)
+# router.register(r'proposals', ExchangeProposalViewSet, basename='proposal')
 
 urlpatterns = [
     # Admin
     path('admin/', admin.site.urls),
-    
-    # Apps
-    path('', include('apps.ads.urls')),
-    path('ads/', include('apps.ads.urls')),
-    path('users/', include('apps.users.urls')),
-    
+
+    path('', include('apps.ads.urls', namespace='ads')), 
+   
+    path('users/', include('apps.users.urls', namespace='users')), 
     # API
-    path('api/', include(router.urls)),
-    path('api/', include('apps.ads.api_urls', namespace='api_ads')),
+    path('api/', include('apps.ads.api_urls', namespace='api_ads')), 
     path('api-auth/', include('rest_framework.urls')),
 ]
 
