@@ -2,33 +2,23 @@ from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from django.db import models
 from .models import Ad, ExchangeProposal
 from .serializers import AdSerializer, ExchangeProposalSerializer, ProposalStatusSerializer
-from django.urls import path
-from . import views
-
-
-urlpatterns = [
-    path('ads/', views.AdListAPIView.as_view(), name='list'),
-    path('ads/<int:pk>/', views.AdDetailAPIView.as_view(), name='detail'),
-    path('ads/search/', views.AdSearchAPIView.as_view(), name='search'),
-    path('proposals/', views.ExchangeProposalListAPIView.as_view(), name='proposal-list'),
-    path('proposals/<int:pk>/', views.ExchangeProposalDetailAPIView.as_view(), name='proposal-detail'),
-]
 
 
 class IsOwnerOrReadOnly(IsAuthenticated):
     """Разрешение: только владелец может редактировать/удалять"""
     
     def has_object_permission(self, request, view, obj):
-        # НОВОЕ: Разрешить чтение всем
+        # Разрешить чтение всем
         if request.method in ['GET', 'HEAD', 'OPTIONS']:
             return True
         
-        # НОВОЕ: Разрешить изменение только владельцу
+        # Разрешить изменение только владельцу
         return obj.user == request.user
 
 
@@ -37,6 +27,8 @@ class AdViewSet(viewsets.ModelViewSet):
     queryset = Ad.objects.filter(is_active=True)
     serializer_class = AdSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    # Парсеры для обработки файлов
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['category', 'condition', 'user']
     search_fields = ['title', 'description']
@@ -53,10 +45,18 @@ class AdViewSet(viewsets.ModelViewSet):
         """Автоматическое присвоение пользователя при создании"""
         serializer.save(user=self.request.user)
     
+    def perform_update(self, serializer):
+        """Обработка обновления с удалением старого изображения"""
+        instance = self.get_object()
+        # Если загружается новое изображение, удаляем старое
+        if 'image' in self.request.FILES and instance.image:
+            instance.image.delete(save=False)
+        serializer.save()
+    
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def my_ads(self, request):
         """Получить объявления текущего пользователя"""
-        # НОВОЕ: Включить неактивные объявления для владельца
+        # Включить неактивные объявления для владельца
         ads = Ad.objects.filter(user=request.user)
         serializer = self.get_serializer(ads, many=True)
         return Response(serializer.data)
@@ -65,7 +65,7 @@ class AdViewSet(viewsets.ModelViewSet):
     def deactivate(self, request, pk=None):
         """Деактивировать объявление"""
         ad = self.get_object()
-        # НОВОЕ: Проверка прав
+        # Проверка прав
         if ad.user != request.user:
             return Response(
                 {'error': 'Вы не можете деактивировать чужое объявление'},
@@ -88,7 +88,7 @@ class ExchangeProposalViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Получить предложения текущего пользователя"""
         user = self.request.user
-        # НОВОЕ: Показывать только предложения, где пользователь участвует
+        # Показывать только предложения, где пользователь участвует
         return ExchangeProposal.objects.filter(
             models.Q(sender=user) | models.Q(receiver=user)
         ).select_related('ad_sender', 'ad_receiver', 'sender', 'receiver')
@@ -110,7 +110,7 @@ class ExchangeProposalViewSet(viewsets.ModelViewSet):
         """Принять предложение обмена"""
         proposal = self.get_object()
         
-        # НОВОЕ: Использование сериализатора для валидации
+        # Использование сериализатора для валидации
         status_serializer = ProposalStatusSerializer(
             data={'status': 'accepted'},
             context={'proposal': proposal, 'request': request}
@@ -126,7 +126,7 @@ class ExchangeProposalViewSet(viewsets.ModelViewSet):
         """Отклонить предложение обмена"""
         proposal = self.get_object()
         
-        # НОВОЕ: Использование сериализатора для валидации
+        # Использование сериализатора для валидации
         status_serializer = ProposalStatusSerializer(
             data={'status': 'rejected'},
             context={'proposal': proposal, 'request': request}

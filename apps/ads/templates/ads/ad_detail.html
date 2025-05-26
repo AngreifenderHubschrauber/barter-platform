@@ -6,7 +6,9 @@
 <div class="row">
     <div class="col-lg-8">
         <div class="card mb-4">
-            {% if ad.image_url %}
+            {% if ad.image %}
+            <img src="{{ ad.image.url }}" class="card-img-top" alt="{{ ad.title }}" style="max-height: 500px; object-fit: contain;">
+            {% elif ad.image_url %}
             <img src="{{ ad.image_url }}" class="card-img-top" alt="{{ ad.title }}" style="max-height: 500px; object-fit: contain;">
             {% endif %}
             <div class="card-body">
@@ -63,20 +65,19 @@
                 <h5 class="mb-0">Другие объявления {{ ad.user.username }}</h5>
             </div>
             <div class="card-body">
-                {% with other_ads=ad.user.ads.exclude(pk=ad.pk).filter(is_active=True)[:5] %}
-                {% if other_ads %}
+                {% if other_ads_from_user %}
                 <div class="list-group">
-                    {% for other_ad in other_ads %}
-                    <a href="{% url 'ads:ad_detail' other_ad.pk %}" class="list-group-item list-group-item-action">
-                        <h6 class="mb-1">{{ other_ad.title }}</h6>
-                        <small class="text-muted">{{ other_ad.get_category_display }}</small>
-                    </a>
+                    {% for other_ad in other_ads_from_user %}
+                        <a href="{% url 'ads:ad_detail' other_ad.pk %}" class="list-group-item list-group-item-action">
+                            <h5 class="mb-1">{{ other_ad.title }}</h5>
+                            <small class="text-muted">{{ other_ad.get_category_display }}</small>
+                        </a>
                     {% endfor %}
                 </div>
+
                 {% else %}
                 <p class="text-muted mb-0">Других активных объявлений нет.</p>
                 {% endif %}
-                {% endwith %}
             </div>
         </div>
     </div>

@@ -16,15 +16,26 @@ class AdSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     category_display = serializers.CharField(source='get_category_display', read_only=True)
     condition_display = serializers.CharField(source='get_condition_display', read_only=True)
+    # Поле для получения URL изображения
+    display_image_url = serializers.SerializerMethodField()
     
     class Meta:
         model = Ad
         fields = [
-            'id', 'user', 'title', 'description', 'image_url',
-            'category', 'category_display', 'condition', 'condition_display',
-            'created_at', 'updated_at', 'is_active'
+            'id', 'user', 'title', 'description', 'image', 'image_url',
+            'display_image_url', 'category', 'category_display', 
+            'condition', 'condition_display', 'created_at', 'updated_at', 'is_active'
         ]
-        read_only_fields = ['id', 'user', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'user', 'created_at', 'updated_at', 'display_image_url']
+    
+    def get_display_image_url(self, obj):
+        """Получить URL изображения для отображения"""
+        request = self.context.get('request')
+        if obj.image and request:
+            return request.build_absolute_uri(obj.image.url)
+        elif obj.image_url:
+            return obj.image_url
+        return None
     
     def validate_title(self, value):
         """Валидация заголовка"""
@@ -37,6 +48,22 @@ class AdSerializer(serializers.ModelSerializer):
         if len(value) < 20:
             raise serializers.ValidationError('Описание должно содержать минимум 20 символов')
         return value
+    
+    def validate_image(self, value):
+        """Валидация изображения"""
+        if value:
+            # Проверка размера файла (макс 5MB)
+            if value.size > 5 * 1024 * 1024:
+                raise serializers.ValidationError('Размер файла не должен превышать 5MB')
+        return value
+    
+    def validate(self, attrs):
+        """Общая валидация"""
+        # Проверка, что указано хотя бы одно изображение
+        if not attrs.get('image') and not attrs.get('image_url') and not self.instance:
+            # Для новых объявлений изображение необязательно
+            pass
+        return attrs
 
 
 class ExchangeProposalSerializer(serializers.ModelSerializer):

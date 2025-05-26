@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 
-app_name = 'ads' # Оставляем это здесь для reverse lookup в веб-интерфейсе
+app_name = 'ads'
 
 urlpatterns = [
     # Объявления

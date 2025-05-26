@@ -10,7 +10,7 @@ from .models import Ad, ExchangeProposal
 from .forms import AdForm, ExchangeProposalForm, SearchForm
 from rest_framework import generics, permissions
 from .serializers import AdSerializer, ExchangeProposalSerializer
-from .permissions import IsOwnerOrReadOnly # Предполагается, что этот файл существует
+from .permissions import IsOwnerOrReadOnly
 
 
 # API Views
@@ -108,16 +108,20 @@ class AdDetailView(DetailView):
     model = Ad
     template_name = 'ads/ad_detail.html'
     context_object_name = 'ad'
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Проверка, может ли пользователь редактировать объявление
         if self.request.user.is_authenticated:
             context['can_edit'] = self.object.can_edit(self.request.user)
-            context['user_ads'] = Ad.objects.filter(
-                user=self.request.user, 
+
+            context['other_ads_from_user'] = Ad.objects.filter(
+                user=self.object.user, # Объявления пользователя, которому принадлежит текущее объявление
                 is_active=True
-            ).exclude(pk=self.object.pk)
+            ).exclude(
+                pk=self.object.pk # Исключаем текущее объявление
+            ).order_by('?')[:5]
+
         return context
 
 

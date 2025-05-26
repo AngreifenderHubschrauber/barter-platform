@@ -95,12 +95,9 @@ class SearchForm(forms.Form):
     """Форма поиска объявлений"""
     
     query = forms.CharField(
+        label='Поиск',
         required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Поиск по заголовку и описанию...'
-        }),
-        label='Поиск'
+        widget=forms.TextInput(attrs={'placeholder': 'Поиск по заголовку и описанию', 'class': 'form-control'})
     )
     category = forms.ChoiceField(
         required=False,
@@ -118,3 +115,4 @@ class SearchForm(forms.Form):
         }),
         label='Состояние'
     )
+
