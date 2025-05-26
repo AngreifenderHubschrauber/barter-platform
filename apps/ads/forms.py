@@ -7,7 +7,7 @@ class AdForm(forms.ModelForm):
     
     class Meta:
         model = Ad
-        fields = ['title', 'description', 'image_url', 'category', 'condition']
+        fields = ['title', 'description', 'image', 'image_url', 'category', 'condition']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -18,9 +18,13 @@ class AdForm(forms.ModelForm):
                 'rows': 5,
                 'placeholder': 'Опишите ваш товар'
             }),
+            'image': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*'
+            }),
             'image_url': forms.URLInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'https://example.com/image.jpg (необязательно)'
+                'placeholder': 'https://example.com/image.jpg (альтернатива загрузке файла)'
             }),
             'category': forms.Select(attrs={
                 'class': 'form-select'
@@ -32,9 +36,14 @@ class AdForm(forms.ModelForm):
         labels = {
             'title': 'Заголовок',
             'description': 'Описание',
+            'image': 'Загрузить изображение',
             'image_url': 'URL изображения',
             'category': 'Категория',
             'condition': 'Состояние',
+        }
+        help_texts = {
+            'image': 'Загрузите фото товара (максимум 5MB, форматы: JPG, PNG, GIF)',
+            'image_url': 'Или укажите ссылку на изображение в интернете',
         }
     
     def clean_title(self):
@@ -50,6 +59,31 @@ class AdForm(forms.ModelForm):
         if len(description) < 20:
             raise forms.ValidationError('Описание должно содержать минимум 20 символов')
         return description
+    
+    def clean_image(self):
+        """Валидация загружаемого изображения"""
+        image = self.cleaned_data.get('image')
+        if image:
+            # Проверка размера файла (максимум 5MB)
+            if image.size > 5 * 1024 * 1024:
+                raise forms.ValidationError('Размер файла не должен превышать 5MB')
+            
+            # Проверка типа файла
+            if not image.content_type.startswith('image/'):
+                raise forms.ValidationError('Загружаемый файл должен быть изображением')
+        
+        return image
+    
+    def clean(self):
+        """Общая валидация формы"""
+        cleaned_data = super().clean()
+        image = cleaned_data.get('image')
+        image_url = cleaned_data.get('image_url')
+        
+        # Проверяем, что указано хотя бы одно изображение (необязательно)
+        # Можно оставить объявление без изображения
+        
+        return cleaned_data
 
 
 class ExchangeProposalForm(forms.ModelForm):
@@ -115,4 +149,3 @@ class SearchForm(forms.Form):
         }),
         label='Состояние'
     )
-

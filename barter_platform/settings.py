@@ -5,6 +5,7 @@ Django settings for barter_platform project.
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+import sys
 
 # Load environment variables
 load_dotenv()
@@ -146,3 +147,70 @@ CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:3000'
 
 # Email settings (for future notifications)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# ========================================
+# НАСТРОЙКИ ДЛЯ ТЕСТИРОВАНИЯ
+# ========================================
+
+# Определяем, что запущены тесты
+if 'test' in sys.argv or 'pytest' in sys.modules:
+    print("🧪 Режим тестирования активирован")
+    
+    # Используем базу данных в памяти для быстрых тестов
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
+        'OPTIONS': {
+            'timeout': 20,
+        }
+    }
+    
+    # Простой хэшер паролей для ускорения тестов
+    PASSWORD_HASHERS = [
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+    ]
+    
+    # Отключаем миграции для ускорения (использовать с осторожностью)
+    # class DisableMigrations:
+    #     def __contains__(self, item):
+    #         return True
+    #     def __getitem__(self, item):
+    #         return None
+    # MIGRATION_MODULES = DisableMigrations()
+    
+    # Email backend для тестов
+    EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+    
+    # Отключаем кэширование в тестах
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        }
+    }
+    
+    # Используем временную директорию для медиа файлов
+    import tempfile
+    MEDIA_ROOT = tempfile.mkdtemp()
+    
+    # Упрощенное логирование для тестов
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'level': 'ERROR',
+            },
+        },
+        'root': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+        },
+    }
+    
+    # Отключаем статические файлы для тестов
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+    
+    # Увеличиваем лимиты для тестовых данных
+    DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
+    FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024   # 10MB

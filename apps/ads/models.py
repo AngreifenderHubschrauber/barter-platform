@@ -2,6 +2,16 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils import timezone
+import os
+
+
+def ad_image_upload_path(instance, filename):
+    """Путь для загрузки изображений объявлений"""
+    # Получаем расширение файла
+    ext = filename.split('.')[-1]
+    # Создаем имя файла: ad_id_user_id.расширение
+    filename = f'ad_{instance.user.id}_{timezone.now().strftime("%Y%m%d_%H%M%S")}.{ext}'
+    return os.path.join('ads', filename)
 
 
 class Ad(models.Model):
@@ -31,6 +41,14 @@ class Ad(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ads', verbose_name='Пользователь')
     title = models.CharField(max_length=200, verbose_name='Заголовок')
     description = models.TextField(verbose_name='Описание')
+    # Добавляем поле для загрузки изображений
+    image = models.ImageField(
+        upload_to=ad_image_upload_path, 
+        blank=True, 
+        null=True, 
+        verbose_name='Изображение',
+        help_text='Загрузите изображение товара (максимум 5MB)'
+    )
     image_url = models.URLField(blank=True, null=True, verbose_name='URL изображения')
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, verbose_name='Категория')
     condition = models.CharField(max_length=20, choices=CONDITION_CHOICES, verbose_name='Состояние')
@@ -49,6 +67,14 @@ class Ad(models.Model):
     def get_absolute_url(self):
         return reverse('ads:ad_detail', kwargs={'pk': self.pk})
     
+    def get_image_url(self):
+        """Получить URL изображения (приоритет: загруженное изображение, затем URL)"""
+        if self.image:
+            return self.image.url
+        elif self.image_url:
+            return self.image_url
+        return None
+    
     def can_edit(self, user):
         """Проверка прав на редактирование"""
         return self.user == user
@@ -56,6 +82,14 @@ class Ad(models.Model):
     def can_delete(self, user):
         """Проверка прав на удаление"""
         return self.user == user
+    
+    def delete(self, *args, **kwargs):
+        """Переопределяем удаление для удаления файла изображения"""
+        if self.image:
+            # Удаляем файл изображения при удалении объявления
+            if os.path.isfile(self.image.path):
+                os.remove(self.image.path)
+        super().delete(*args, **kwargs)
 
 
 class ExchangeProposal(models.Model):

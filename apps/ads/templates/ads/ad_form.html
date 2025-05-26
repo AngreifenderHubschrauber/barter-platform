@@ -19,7 +19,8 @@
                 </h3>
             </div>
             <div class="card-body">
-                <form method="post" novalidate>
+                <!-- ВАЖНО: добавляем enctype для загрузки файлов -->
+                <form method="post" enctype="multipart/form-data" novalidate>
                     {% csrf_token %}
                     
                     <!-- Отображение ошибок формы -->
@@ -29,7 +30,76 @@
                     </div>
                     {% endif %}
                     
-                    {{ form|crispy }}
+                    <!-- Заголовок -->
+                    <div class="mb-3">
+                        <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                        <div class="text-danger small">{{ form.title.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Описание -->
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <div class="text-danger small">{{ form.description.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Изображения -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.image.id_for_label }}" class="form-label">{{ form.image.label }}</label>
+                            {{ form.image }}
+                            {% if form.image.help_text %}
+                            <div class="form-text">{{ form.image.help_text }}</div>
+                            {% endif %}
+                            {% if form.image.errors %}
+                            <div class="text-danger small">{{ form.image.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.image_url.id_for_label }}" class="form-label">{{ form.image_url.label }}</label>
+                            {{ form.image_url }}
+                            {% if form.image_url.help_text %}
+                            <div class="form-text">{{ form.image_url.help_text }}</div>
+                            {% endif %}
+                            {% if form.image_url.errors %}
+                            <div class="text-danger small">{{ form.image_url.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Превью текущего изображения при редактировании -->
+                    {% if form.instance.pk and form.instance.get_image_url %}
+                    <div class="mb-3">
+                        <label class="form-label">Текущее изображение:</label>
+                        <div>
+                            <img src="{{ form.instance.get_image_url }}" alt="{{ form.instance.title }}" 
+                                 class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Категория и состояние -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.category.id_for_label }}" class="form-label">{{ form.category.label }}</label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                            <div class="text-danger small">{{ form.category.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.condition.id_for_label }}" class="form-label">{{ form.condition.label }}</label>
+                            {{ form.condition }}
+                            {% if form.condition.errors %}
+                            <div class="text-danger small">{{ form.condition.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
                     
                     <hr>
                     
@@ -56,7 +126,7 @@
                 <ul class="mb-0">
                     <li>Используйте понятный и информативный заголовок</li>
                     <li>Подробно опишите состояние товара и его особенности</li>
-                    <li>Добавьте ссылку на изображение товара для привлечения внимания</li>
+                    <li>Загрузите качественное фото товара или укажите ссылку на изображение</li>
                     <li>Выберите правильную категорию для лучшей видимости</li>
                     <li>Честно укажите состояние товара</li>
                 </ul>
@@ -64,4 +134,61 @@
         </div>
     </div>
 </div>
+
+<!-- JavaScript для превью изображения -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const imageInput = document.getElementById('{{ form.image.id_for_label }}');
+    const imageUrlInput = document.getElementById('{{ form.image_url.id_for_label }}');
+    
+    // Превью для загружаемого файла
+    if (imageInput) {
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    showImagePreview(e.target.result, 'Превью загруженного изображения');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    // Превью для URL
+    if (imageUrlInput) {
+        imageUrlInput.addEventListener('input', function(e) {
+            const url = e.target.value;
+            if (url) {
+                showImagePreview(url, 'Превью изображения по URL');
+            }
+        });
+    }
+    
+    function showImagePreview(src, title) {
+        // Удаляем предыдущее превью
+        const existingPreview = document.getElementById('image-preview');
+        if (existingPreview) {
+            existingPreview.remove();
+        }
+        
+        // Создаем новое превью
+        const previewDiv = document.createElement('div');
+        previewDiv.id = 'image-preview';
+        previewDiv.className = 'mb-3';
+        previewDiv.innerHTML = `
+            <label class="form-label">${title}:</label>
+            <div>
+                <img src="${src}" alt="Preview" class="img-thumbnail" 
+                     style="max-width: 200px; max-height: 200px;" 
+                     onerror="this.style.display='none'">
+            </div>
+        `;
+        
+        // Добавляем после полей изображения
+        const imageRow = document.querySelector('.row.mb-3');
+        imageRow.insertAdjacentElement('afterend', previewDiv);
+    }
+});
+</script>
 {% endblock %}
