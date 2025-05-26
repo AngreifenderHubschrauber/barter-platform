@@ -1,5 +1,3 @@
-// НОВОЕ: Основной JavaScript файл для проекта
-
 document.addEventListener('DOMContentLoaded', function() {
     // Автоматическое скрытие сообщений через 5 секунд
     const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');

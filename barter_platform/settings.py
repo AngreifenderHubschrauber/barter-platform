@@ -28,15 +28,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
-    # Third party apps
+    'widget_tweaks',
     'rest_framework',
     'corsheaders',
     'crispy_forms',
     'crispy_bootstrap5',
-    'django_filters',  # Правильное название модуля
-    
-    # Local apps
+    'django_filters',  
     'apps.ads',
     'apps.users',
 ]
@@ -46,8 +43,8 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware', 
-    'django.contrib.auth.middleware.AuthenticationMiddleware', 
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -110,6 +107,10 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 # Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Максимальный размер загружаемых файлов (5MB)
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

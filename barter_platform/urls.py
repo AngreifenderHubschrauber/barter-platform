@@ -20,15 +20,6 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-# УДАЛИТЕ ЭТИ ДВЕ СТРОКИ:
-# from rest_framework.routers import DefaultRouter
-# from apps.ads.api_views import AdViewSet, ExchangeProposalViewSet
-
-# УДАЛИТЕ ЭТИ ДВЕ СТРОКИ, так как роутер теперь в apps/ads/urls_api.py:
-# router = DefaultRouter()
-# router.register(r'ads', AdViewSet)
-# router.register(r'proposals', ExchangeProposalViewSet, basename='proposal')
-
 urlpatterns = [
     # Admin
     path('admin/', admin.site.urls),

@@ -26,7 +26,7 @@ class Ad(models.Model):
         ('fair', 'Удовлетворительное'),
     ]
     
-    # Добавлен id как автоинкрементное поле
+    # id как автоинкрементное поле
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ads', verbose_name='Пользователь')
     title = models.CharField(max_length=200, verbose_name='Заголовок')
@@ -67,7 +67,7 @@ class ExchangeProposal(models.Model):
         ('rejected', 'Отклонено'),
     ]
     
-    # Добавлен id как автоинкрементное поле
+    # id как автоинкрементное поле
     id = models.AutoField(primary_key=True)
     ad_sender = models.ForeignKey(Ad, on_delete=models.CASCADE, related_name='sent_proposals', verbose_name='Объявление отправителя')
     ad_receiver = models.ForeignKey(Ad, on_delete=models.CASCADE, related_name='received_proposals', verbose_name='Объявление получателя')

@@ -81,20 +81,6 @@ python manage.py runserver
 
 Приложение будет доступно по адресу: http://localhost:8000
 
-## Структура проекта
-
-```
-barter_platform/
-├── apps/
-│   ├── ads/          # Приложение для объявлений и обменов
-│   └── users/        # Приложение для пользователей
-├── barter_platform/  # Настройки проекта
-├── static/           # Статические файлы
-├── templates/        # Базовые шаблоны
-├── media/            # Загруженные файлы
-└── manage.py         # Утилита управления Django
-```
-
 ## API Endpoints
 
 ### Объявления
@@ -146,7 +132,3 @@ python manage.py test apps.users
    ```bash
    gunicorn barter_platform.wsgi:application
    ```
-
-## Лицензия
-
-MIT License
