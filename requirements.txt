@@ -12,3 +12,4 @@ pytest-django==4.7.0
 gunicorn==21.2.0
 redis==5.0.1
 celery==5.3.4
+django-widget-tweaks==1.5.0
