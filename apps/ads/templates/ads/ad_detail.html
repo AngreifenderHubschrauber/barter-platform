@@ -6,9 +6,13 @@
 <div class="row">
     <div class="col-lg-8">
         <div class="card mb-4">
-            {% if ad.image %}
-            <img src="{{ ad.image.url }}" class="card-img-top" alt="{{ ad.title }}" style="max-height: 500px; object-fit: contain;">
-            {% elif ad.image_url %}
+            {% if ad.image_url %}
+            <img src="{{ ad.image_url }}" class="card-img-top" alt="{{ ad.title }}" style="max-height: 500px; object-fit: contain;">
+            {% else %}
+            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 500px; object-fit: contain;">
+                <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+            </div>
+            {% endif %}
             <img src="{{ ad.image_url }}" class="card-img-top" alt="{{ ad.title }}" style="max-height: 500px; object-fit: contain;">
             {% endif %}
             <div class="card-body">

@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+# barter_platform/barter_platform/urls.py
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
@@ -23,15 +24,12 @@ urlpatterns = [
     # Admin
     path('admin/', admin.site.urls),
 
-    # Web Apps
-    # Оставляем только одно включение для веб-интерфейса ads.
-    path('', include('apps.ads.urls', namespace='ads')), # Указываем namespace явно
-    # path('ads/', include('apps.ads.urls', namespace='ads')), 
-    path('users/', include('apps.users.urls', namespace='users')), # Указываем namespace явно
-
+    path('', include('apps.ads.urls', namespace='ads')), 
+   
+    path('users/', include('apps.users.urls', namespace='users')), 
     # API
-    path('api/', include('apps.ads.api_urls', namespace='api_ads')), # Включаем API-маршруты из urls_api.py
-    path('api-auth/', include('rest_framework.urls')), # Для аутентификации DRF
+    path('api/', include('apps.ads.api_urls', namespace='api_ads')), 
+    path('api-auth/', include('rest_framework.urls')),
 ]
 
 # Обслуживание медиа файлов в режиме разработки
